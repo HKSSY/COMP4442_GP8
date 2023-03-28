@@ -3,7 +3,8 @@ import os
 from flask import Flask
 from flask import request
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType,StructField, StringType, IntegerType, BooleanType
+from pyspark.sql.types import StructType,StructField, StringType, IntegerType, BooleanType, TimestampType
+from pyspark.sql.functions import unix_timestamp
 
 spark = SparkSession.builder.getOrCreate()
 
@@ -20,34 +21,15 @@ print('  \:\  \            \::/  /   \:\ \:\__\    \:\ \:\__\     /:/  /        
 print('   \:\  \           /:/  /     \:\ \/__/     \:\ \/__/     \/__/            /:/  /        /:/  /   ')
 print('    \:\__\         /:/  /       \:\__\        \:\__\                       /:/  /        /:/  /    ')
 print('     \/__/         \/__/         \/__/         \/__/                       \/__/         \/__/     ')
-print('                                COMP4442 Project     Version: 0.9.1                                ')
+print('                                COMP4442 Project     Version: 0.9.2                                ')
 
-def produce_pi(scale):
-    spark = SparkSession.builder.appName("PythonPi").getOrCreate()
-    n = 100000 * scale
+# Dataset location settings
+dataset_directory = r"/home/comp4442/Downloads/detail-records/"
 
-    def f(_):
-        from random import random
-        x = random()
-        y = random()
-        return 1 if x ** 2 + y ** 2 <= 1 else 0
-
-    count = spark.sparkContext.parallelize(
-        xrange(1, n + 1), scale).map(f).reduce(lambda x, y: x + y)
-    spark.stop()
-    pi = 4.0 * count / n
-    return pi
-
-
-@app.route("/")
-def index():
-    return "Python Flask SparkPi server running. Add the 'sparkpi' route to this URL to invoke the app."
-
-
-@app.route("/sparkpireadtest")
-def sparkpi():
-    customSchema = StructType([
-    StructField("driverID", StringType(), True),        
+def load_dataset():
+    global dataset_dataframe
+    customSchema = StructType([ # Set a custom schema for the dataset
+    StructField("driverID", StringType(), True),
     StructField("carPlateNumber", StringType(), True),
     StructField("Latitude", StringType(), True),
     StructField("Longtitude", StringType(), True),
@@ -68,20 +50,56 @@ def sparkpi():
     StructField("isOilLeak", StringType(), True)
     ])
 
-    df = spark.read\
-        .option('header', True)\
-        .option('escape', '"')\
-        .schema(customSchema)\
-        .csv('/home/comp4442/Downloads/detail-records/detail_record_2017_01_02_08_00_00')
+    try:
+        search_directory = dataset_directory
+        dataset_full_path_list = []
+
+        for file in os.listdir(os.path.join(search_directory)):
+            dataset_file_path = os.path.join(search_directory, file)
+            dataset_full_path_list.append(dataset_file_path)
+
+        #print(dataset_full_path_list)
+
+        dataset_dataframe = spark.read\
+                .option('header', False)\
+                .option('escape', '"')\
+                .schema(customSchema)\
+                .csv(dataset_full_path_list)
+        
+        dataset_dataframe.cache()
+
+        #list_dataset = df.select('*').collect()
+        #test = df.select('driverID').collect()
+        print("Message: Read dataset successfully")
+        print(*dataset_full_path_list, sep = "\n")
+    except FileNotFoundError:
+        print("Initialization error: The dataset directory does not exist")
+        exit()
+
+    #return message
+
+
+@app.route("/")
+def index():
+    #test = dataset_dataframe.select('driverID').collect()
+    #test = dataset_dataframe.where("Time = '2017-01-01'").collect()
+    test = dataset_dataframe.where("carPlateNumber = '华AVM936'").collect()
+    print(dataset_dataframe.is_cached)
+    return str(test)
+
+
+@app.route("/about")
+def sparkpi():
     #scale = int(request.args.get('scale', 2))
     #pi = produce_pi(scale)
-    test = df._jdf.schema().treeString()
+    #test = load_dataset.df._jdf.schema().treeString()
     #response = str(test)
-    response = df.select('*').collect()
+    #command = ".select('*').collect()"
+    response = load_dataset()
     return response
 
 
 if __name__ == "__main__":
+    load_dataset()
     port = int(os.environ.get("PORT", 7777))
     app.run(host='0.0.0.0', port=port)
-
