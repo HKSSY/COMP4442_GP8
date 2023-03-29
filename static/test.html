@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Index</title>
+    <link rel="stylesheet" type="text/css" href="/static/css/test.css">
+</head>
+<body>
+    <h1>COMP4442</h1>
+    {% block content %}
+        {% for response in messages %}
+            <p>LIST: {{ response['message'] }}</p>
+        {% endfor %}
+    {% endblock %}
+</body>
+</html>

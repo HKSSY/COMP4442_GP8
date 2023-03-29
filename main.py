@@ -1,14 +1,15 @@
 import os
+import socket
 
-from flask import Flask
+from pathlib import Path
+from flask import Flask, render_template
 from flask import request
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType,StructField, StringType, IntegerType, BooleanType, TimestampType
-from pyspark.sql.functions import unix_timestamp
+from pyspark.sql.functions import count, countDistinct, col, max as sparkMax
 
 spark = SparkSession.builder.getOrCreate()
 
-app = Flask(__name__)
 
 print('      ___           ___           ___           ___           ___           ___           ___      ')
 print('     /\  \         /\__\         /\  \         /\  \         /\  \         /\  \         /\__\     ')
@@ -21,10 +22,24 @@ print('  \:\  \            \::/  /   \:\ \:\__\    \:\ \:\__\     /:/  /        
 print('   \:\  \           /:/  /     \:\ \/__/     \:\ \/__/     \/__/            /:/  /        /:/  /   ')
 print('    \:\__\         /:/  /       \:\__\        \:\__\                       /:/  /        /:/  /    ')
 print('     \/__/         \/__/         \/__/         \/__/                       \/__/         \/__/     ')
-print('                                COMP4442 Project     Version: 0.9.2                                ')
+print('                                COMP4442 Project     Version: 0.9.3                                ')
+
+# Check whether the port is open. if it is used by other application, it will switch the other listen port
+host = "localhost"
+port = 3500
+for i in range(0,10):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    if sock.connect_ex((host, port)) == 0:
+        port += 1
+        print("The current port is: " + str(port))
+        sock.close()
+    else:
+        print("The current port is: " + str(port))
+        break
 
 # Dataset location settings
-dataset_directory = r"/home/comp4442/Downloads/detail-records/"
+current_path = Path(__file__).absolute().parent
+dataset_directory = current_path / "detail-records/"
 
 def load_dataset():
     global dataset_dataframe
@@ -33,7 +48,7 @@ def load_dataset():
     StructField("carPlateNumber", StringType(), True),
     StructField("Latitude", StringType(), True),
     StructField("Longtitude", StringType(), True),
-    StructField("Speed", StringType(), True),
+    StructField("Speed", IntegerType(), True),
     StructField("Direction", StringType(), True),
     StructField("siteName", StringType(), True),
     StructField("Time", StringType(), True),
@@ -65,7 +80,7 @@ def load_dataset():
                 .option('escape', '"')\
                 .schema(customSchema)\
                 .csv(dataset_full_path_list)
-        
+        dataset_dataframe.createOrReplaceTempView("TABLE")
         dataset_dataframe.cache()
 
         #list_dataset = df.select('*').collect()
@@ -78,28 +93,34 @@ def load_dataset():
 
     #return message
 
+app = Flask(__name__, static_url_path='/static', template_folder='static/') # add path for the HTML files
 
-@app.route("/")
+@app.route("/", methods=['GET'])
 def index():
+    return app.send_static_file('index.html')
+
+@app.route("/test", methods=['GET', 'POST'])
+def sparkpi():
     #test = dataset_dataframe.select('driverID').collect()
     #test = dataset_dataframe.where("Time = '2017-01-01'").collect()
-    test = dataset_dataframe.where("carPlateNumber = '华AVM936'").collect()
-    print(dataset_dataframe.is_cached)
-    return str(test)
-
-
-@app.route("/about")
-def sparkpi():
-    #scale = int(request.args.get('scale', 2))
-    #pi = produce_pi(scale)
-    #test = load_dataset.df._jdf.schema().treeString()
-    #response = str(test)
-    #command = ".select('*').collect()"
-    response = load_dataset()
-    return response
+    #test = dataset_dataframe.where("isHthrottleStop = 'NaN'").collect()
+    #print(test)
+    #count1 = dataset_dataframe.filter((col('driverID') == 'haowei1000008')).count()
+    #print(count1)
+    #count2 = dataset_dataframe.filter((col('driverID') == 'haowei1000008') & (col('isHthrottleStop').isNotNull())).count()
+    #print(count2)
+    #count = dataset_dataframe.filter((col('driverID') == 'haowei1000008') & (col('isHthrottleStop').isNull())).count()
+    #print(count)
+    #count3 = dataset_dataframe.groupBy('driverID').count().show()
+    #count3 = dataset_dataframe.select((col('driverID') == 'haowei1000008') & sparkMax(col('Speed'))).show()
+    #spark.sql("SELECT * FROM TABLE WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
+    #spark.sql("SELECT MAX(Speed) FROM TABLE WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
+    a = spark.sql("SELECT driverID, COUNT(isHthrottleStop), COUNT(isOilLeak) FROM TABLE GROUP BY driverID").collect()
+    response = [{"message": a}]
+    #print(response)
+    return render_template('test.html', messages=response)
 
 
 if __name__ == "__main__":
     load_dataset()
-    port = int(os.environ.get("PORT", 7777))
-    app.run(host='0.0.0.0', port=port)
+    app.run(host, port)
