@@ -2,15 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Index</title>
+    <title>TEST</title>
     <link rel="stylesheet" type="text/css" href="/static/css/test.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/ico/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/ico/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/ico/favicon-16x16.png">
+    <link rel="manifest" href="/static/ico/site.webmanifest">
+    <link rel="mask-icon" href="/static/ico/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
 </head>
 <body>
-    <h1>COMP4442</h1>
-    {% block content %}
-        {% for response in messages %}
-            <p>LIST: {{ response['message'] }}</p>
+    <h1>COMP4442 dataset select test</h1>
+    <select name= test method="GET" action="/">
+        {% for options in option_driver_id %}
+            <option value= "{{options}}" SELECTED>{{options}}</option>"
         {% endfor %}
-    {% endblock %}
+    </select>
+    <select name= test2 method="GET" action="/">
+        {% for options in opt_car_plate_number %}
+            <option value= "{{options}}" SELECTED>{{options}}</option>"
+        {% endfor %}
+    </select>
+    <div class="footer">
+        <div class="content-wrapper">
+            <p>&copy; COMP4442 Group 8</p>
+        <div>
+    </div>
 </body>
 </html>
