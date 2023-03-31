@@ -4,8 +4,24 @@
     <meta charset="UTF-8">
     <title>Index</title>
     <link rel="stylesheet" type="text/css" href="/static/css/test.css">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/ico/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/ico/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/ico/favicon-16x16.png">
+    <link rel="manifest" href="/static/ico/site.webmanifest">
+    <link rel="mask-icon" href="/static/ico/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#da532c">
+    <meta name="theme-color" content="#ffffff">
 </head>
 <body>
-    <h1>COMP4442</h1>
+    <h1>COMP4442 dataset summary</h1>
+    {% for table in tables %}
+        <!--{{titles[loop.index]}}-->
+        {{ table|safe }}
+    {% endfor %}
+    <div class="footer">
+        <div class="content-wrapper">
+            <p>&copy; COMP4442 Group 8</p>
+        <div>
+    </div>
 </body>
 </html>

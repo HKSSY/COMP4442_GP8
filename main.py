@@ -1,5 +1,6 @@
 import os
 import socket
+import pandas
 
 from pathlib import Path
 from flask import Flask, render_template
@@ -22,7 +23,7 @@ print('  \:\  \            \::/  /   \:\ \:\__\    \:\ \:\__\     /:/  /        
 print('   \:\  \           /:/  /     \:\ \/__/     \:\ \/__/     \/__/            /:/  /        /:/  /   ')
 print('    \:\__\         /:/  /       \:\__\        \:\__\                       /:/  /        /:/  /    ')
 print('     \/__/         \/__/         \/__/         \/__/                       \/__/         \/__/     ')
-print('                                COMP4442 Project     Version: 0.9.3                                ')
+print('                                COMP4442 Project     Version: 0.9.4                                ')
 
 # Check whether the port is open. if it is used by other application, it will switch the other listen port
 host = "localhost"
@@ -56,10 +57,10 @@ def load_dataset():
     StructField("isRapidlySlowdown", StringType(), True),
     StructField("isNeutralSlide", StringType(), True),
     StructField("isNeutralSlideFinished", StringType(), True),
-    StructField("neutralSlideTime", StringType(), True),
+    StructField("neutralSlideTime", IntegerType(), True),
     StructField("isOverspeed", StringType(), True),
     StructField("isOverspeedFinished", StringType(), True),
-    StructField("overspeedTime", StringType(), True),
+    StructField("overspeedTime", IntegerType(), True),
     StructField("isFatigueDriving", StringType(), True),
     StructField("isHthrottleStop", StringType(), True),
     StructField("isOilLeak", StringType(), True)
@@ -80,7 +81,7 @@ def load_dataset():
                 .option('escape', '"')\
                 .schema(customSchema)\
                 .csv(dataset_full_path_list)
-        dataset_dataframe.createOrReplaceTempView("TABLE")
+        dataset_dataframe.createOrReplaceTempView("RECORD")
         dataset_dataframe.cache()
 
         #list_dataset = df.select('*').collect()
@@ -97,7 +98,16 @@ app = Flask(__name__, static_url_path='/static', template_folder='static/') # ad
 
 @app.route("/", methods=['GET'])
 def index():
-    return app.send_static_file('index.html')
+    sql_query = "driverID AS `Driver ID`, ROUND(AVG(Speed), 1) AS `AVG Speed`, COUNT(isRapidlySpeedup) AS `Rapidly Speedup`, \
+    COUNT(isRapidlySlowdown) AS `Rapidly Slowdown`, COUNT(isNeutralSlide) AS `Neutral Slide`, SUM(neutralSlideTime) AS `Total Neutral Slide`, \
+    COUNT(isOverspeed) AS `Overspeed`, SUM(overspeedTime) AS `Total Overspeed`, COUNT(isFatigueDriving) AS `Fatigue Driving`, \
+    COUNT(isHthrottleStop) AS `Throttle Stop`, COUNT(isOilLeak) AS `Oil Leak`"
+    sql_groupby_query = "GROUP BY driverID"
+    output_summary = spark.sql("SELECT " + sql_query + " FROM RECORD " + sql_groupby_query).toPandas()
+    response = output_summary
+    #print(response)
+    return render_template('index.html', tables=[response.to_html(classes='data', index=False)], titles=response.columns.values)
+    #return app.send_static_file('index.html')
 
 @app.route("/test", methods=['GET', 'POST'])
 def sparkpi():
@@ -113,13 +123,27 @@ def sparkpi():
     #print(count)
     #count3 = dataset_dataframe.groupBy('driverID').count().show()
     #count3 = dataset_dataframe.select((col('driverID') == 'haowei1000008') & sparkMax(col('Speed'))).show()
-    #spark.sql("SELECT * FROM TABLE WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
-    #spark.sql("SELECT MAX(Speed) FROM TABLE WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
-    a = spark.sql("SELECT driverID, COUNT(isHthrottleStop), COUNT(isOilLeak) FROM TABLE GROUP BY driverID").collect()
-    response = [{"message": a}]
+    #spark.sql("SELECT * FROM RECORD WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
+    #spark.sql("SELECT MAX(Speed) FROM RECORD WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
+    sql_query = "driverID"
+    sql_groupby_query = "GROUP BY driverID"
+    output_driver_id = spark.sql("SELECT " + sql_query + " FROM RECORD " + sql_groupby_query).rdd.map(lambda x : x[0]).collect()
+    print(output_driver_id)
+    sql_query = "carPlateNumber"
+    sql_groupby_query = "GROUP BY carPlateNumber"
+    output_car_plate_number = spark.sql("SELECT " + sql_query + " FROM RECORD " + sql_groupby_query).rdd.map(lambda x : x[0]).collect()
+    print(output_car_plate_number)
+    response = output_driver_id
     #print(response)
-    return render_template('test.html', messages=response)
+    return render_template('test.html', option_driver_id=output_driver_id, opt_car_plate_number=output_car_plate_number)
 
+@app.errorhandler(500)
+def handle_bad_request(e):
+    return 'Internal Server Error!', 500
+
+@app.errorhandler(404)
+def handle_bad_request(e):
+    return 'Page not found!', 404
 
 if __name__ == "__main__":
     load_dataset()
