@@ -23,7 +23,7 @@ print('  \:\  \            \::/  /   \:\ \:\__\    \:\ \:\__\     /:/  /        
 print('   \:\  \           /:/  /     \:\ \/__/     \:\ \/__/     \/__/            /:/  /        /:/  /   ')
 print('    \:\__\         /:/  /       \:\__\        \:\__\                       /:/  /        /:/  /    ')
 print('     \/__/         \/__/         \/__/         \/__/                       \/__/         \/__/     ')
-print('                                COMP4442 Project     Version: 0.9.4                                ')
+print('                                COMP4442 Project     Version: 0.9.5                                ')
 
 # Check whether the port is open. if it is used by other application, it will switch the other listen port
 host = "localhost"
@@ -106,7 +106,7 @@ def index():
     output_summary = spark.sql("SELECT " + sql_query + " FROM RECORD " + sql_groupby_query).toPandas()
     response = output_summary
     #print(response)
-    return render_template('index.html', tables=[response.to_html(classes='data', index=False)], titles=response.columns.values)
+    return render_template('index.html', tables=[response.to_html(classes='g--12 g-s--12 card', index=False).replace('<tr style="text-align: right;">', '<tr class="table-header">')], titles=response.columns.values)
     #return app.send_static_file('index.html')
 
 @app.route("/test", methods=['GET', 'POST'])
@@ -136,6 +136,10 @@ def sparkpi():
     response = output_driver_id
     #print(response)
     return render_template('test.html', option_driver_id=output_driver_id, opt_car_plate_number=output_car_plate_number)
+
+@app.route("/about", methods=['GET'])
+def test():
+    return app.send_static_file('about.html')
 
 @app.errorhandler(500)
 def handle_bad_request(e):
