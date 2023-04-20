@@ -1,21 +1,56 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Index</title>
-    <link rel="stylesheet" type="text/css" href="/static/css/surface_styles.css">
-    <link rel="stylesheet" type="text/css" href="/static/css/monokai_sublime.css">
-    <script src="/static/js/highlight.pack.js"></script>
-    <link rel="apple-touch-icon" sizes="180x180" href="/static/ico/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/static/ico/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/static/ico/favicon-16x16.png">
-    <link rel="manifest" href="/static/ico/site.webmanifest">
-    <link rel="mask-icon" href="/static/ico/safari-pinned-tab.svg" color="#5bbad5">
-    <meta name="msapplication-TileColor" content="#da532c">
-    <meta name="theme-color" content="#ffffff">
+  <meta charset="UTF-8">
+  <title>Index</title>
+  <link rel="stylesheet" type="text/css" href="/static/css/surface_styles.css">
+  <link rel="stylesheet" type="text/css" href="/static/css/monokai_sublime.css">
+  <script src="/static/js/highlight.pack.js"></script>
+  <link rel="apple-touch-icon" sizes="180x180" href="/static/ico/apple-touch-icon.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/static/ico/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/static/ico/favicon-16x16.png">
+  <link rel="manifest" href="/static/ico/site.webmanifest">
+  <link rel="mask-icon" href="/static/ico/safari-pinned-tab.svg" color="#5bbad5">
+  <meta name="msapplication-TileColor" content="#da532c">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.13.4/sc-2.1.1/sl-1.6.2/datatables.min.css">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.datatables.net/v/dt/jq-3.6.0/dt-1.13.4/sc-2.1.1/sl-1.6.2/datatables.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#example').DataTable({
+        processing: true,
+        serverSide: true,
+        ajax: {
+          url: '/fetch_data',
+          type: 'POST'
+        },
+        columns: [
+          { "data": "driverID" },
+          { "data": "carPlateNumber" },
+          { "data": "Latitude" },
+          { "data": "Longtitude" },
+          { "data": "Speed" },
+          { "data": "siteName" },
+          { "data": "Time" },
+          { "data": "isRapidlySpeedup" },
+          { "data": "isRapidlySlowdown" },
+          { "data": "isNeutralSlide" },
+          { "data": "isNeutralSlideFinished" },
+          { "data": "neutralSlideTime" },
+          { "data": "isOverspeed" },
+          { "data": "isOverspeedFinished" },
+          { "data": "overspeedTime" },
+          { "data": "isFatigueDriving" },
+          { "data": "isHthrottleStop" },
+          { "data": "isOilLeak" },
+        ]
+      });
+    });
+  </script>
 </head>
 <body>
-    <input type="checkbox" id="nav--super-vertical-responsive">
+  <input type="checkbox" id="nav--super-vertical-responsive">
 	<label for="nav--super-vertical-responsive">MENU</label>
 	<aside class="nav--super-vertical g--2 g-m--3 g-s--6 g-t--12 no-margin-vertical" role="sidebar">
 		<div class="g--12 logo-area no-margin-vertical">
@@ -23,32 +58,45 @@
 		</div>
 		<nav class="g--12 no-margin-vertical" role="navigation">
 			<a href="/">Home</a>
-			<a href="test">test</a>
-			<div class="nav-collapsible">
-				<input type="checkbox" id="nav-collapsible-1">
-				<label for="nav-collapsible-1">Components</label>
-				<div class="nav-collapsible-links">
-					<a href="docs/alerts.html">Alerts</a>
-				</div>
-			</div>
+			<a href="summary">Summary</a>
 			<a href="about">About</a>
 		</nav>
 	</aside>
-    <main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
-        <header class="container">
-			<h1 class="m--1 g--4 g-s--12 docsHeader">Summary</h1>
-		</header>
-        <div class="g--10 m--1">
-            {% for table in tables %}
-                <!--{{titles[loop.index]}}-->
-                {{ table|safe }}
-            {% endfor %}
-        </div>
-    </main>
-    <footer class="g--10 m--2 g-m--12 m-m--0 no-margin-vertical">
-        <div class="g--10 m--1 color--white">
-            &copy; COMP4442 Group 8
-        </div>
-    </footer>
+  <main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
+    <header class="container">
+  <h1 class="m--1 g--4 g-s--12 docsHeader">Home</h1>
+  </header>
+    <div class="g--10 m--1">
+      <table id="example" class="display" style="width:100%">
+        <thead>
+          <tr>
+            <th>driverID</th>
+            <th>carPlateNumber</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Speed</th>
+            <th>siteName</th>
+            <th>Time</th>
+            <th>isRapidlySpeedup</th>
+            <th>isRapidlySlowdown</th>
+            <th>isNeutralSlide</th>
+            <th>isNeutralSlideFinished</th>
+            <th>neutralSlideTime</th>
+            <th>isOverspeed</th>
+            <th>isOverspeedFinished</th>
+            <th>overspeedTime</th>
+            <th>isFatigueDriving</th>
+            <th>isHthrottleStop</th>
+            <th>isOilLeak</th>
+          </tr>
+        </thead>
+      </table>
+    </div>
+  </main>
+  <footer class="g--10 m--2 g-m--12 m-m--0 no-margin-vertical">
+    <div class="g--10 m--1 color--white">
+        &copy; COMP4442 Group 8
+    </div>
+  </footer>
 </body>
 </html>
