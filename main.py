@@ -25,7 +25,7 @@ print('  \:\  \            \::/  /   \:\ \:\__\    \:\ \:\__\     /:/  /        
 print('   \:\  \           /:/  /     \:\ \/__/     \:\ \/__/     \/__/            /:/  /        /:/  /   ')
 print('    \:\__\         /:/  /       \:\__\        \:\__\                       /:/  /        /:/  /    ')
 print('     \/__/         \/__/         \/__/         \/__/                       \/__/         \/__/     ')
-print('                                COMP4442 Project     Version: 0.9.6                                ')
+print('                                COMP4442 Project     Version: 0.9.7                                ')
 
 # Check whether the port is open. if it is used by other application, it will switch the other listen port
 host = "localhost"
@@ -184,7 +184,7 @@ def summary():
     return render_template('summary.html', tables=[response.to_html(classes='g--12 g-s--12 card', index=False).replace('<tr style="text-align: right;">', '<tr class="table-header">')], titles=response.columns.values)
     #return app.send_static_file('index.html')
 
-@app.route("/texxst", methods=['GET', 'POST'])
+@app.route("/car_speed_monitor", methods=['GET', 'POST'])
 def sparkpi():
     #test = dataset_dataframe.select('driverID').collect()
     #test = dataset_dataframe.where("Time = '2017-01-01'").collect()
@@ -200,17 +200,33 @@ def sparkpi():
     #count3 = dataset_dataframe.select((col('driverID') == 'haowei1000008') & sparkMax(col('Speed'))).show()
     #spark.sql("SELECT * FROM RECORD WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
     #spark.sql("SELECT MAX(Speed) FROM RECORD WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
-    sql_query = "driverID"
-    sql_groupby_query = "GROUP BY driverID"
-    output_driver_id = spark.sql("SELECT " + sql_query + " FROM RECORD " + sql_groupby_query).rdd.map(lambda x : x[0]).collect()
-    #print(output_driver_id)
-    sql_query = "carPlateNumber"
-    sql_groupby_query = "GROUP BY carPlateNumber"
-    output_car_plate_number = spark.sql("SELECT " + sql_query + " FROM RECORD " + sql_groupby_query).rdd.map(lambda x : x[0]).collect()
-    #print(output_car_plate_number)
-    response = output_driver_id
-    #print(response)
-    return render_template('test.html', option_driver_id=output_driver_id, opt_car_plate_number=output_car_plate_number)
+    # SQL query with date extracted from "Time" column
+    sql_query = "driverID, DATE(Time) AS `Date`, ROUND(AVG(Speed), 1) AS `AVG Speed`"
+    sql_groupby_query = "GROUP BY driverID, DATE(Time)"
+    sql_orderby_query = "ORDER BY driverID, Date"
+    output_summary = spark.sql("SELECT " + sql_query + " FROM RECORD " + sql_groupby_query + " " + sql_orderby_query).collect()
+    print(output_summary)
+    # Prepare the data for the graph
+    drivers_data = {}
+    for row in output_summary:
+        driver_id = row['driverID']
+        date = row['Date'].strftime("%Y-%m-%d")
+        avg_speed = row['AVG Speed']
+
+        if driver_id not in drivers_data:
+            drivers_data[driver_id] = {
+                'dates': [],
+                'avg_speeds': [],
+            }
+
+        drivers_data[driver_id]['dates'].append(date)
+        drivers_data[driver_id]['avg_speeds'].append(avg_speed)
+
+    # Return the components to the HTML template
+    return render_template(
+        template_name_or_list='car_speed_monitor.html',
+        drivers_data=drivers_data,
+    )
 
 @app.route("/about", methods=['GET'])
 def about_page():
