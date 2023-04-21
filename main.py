@@ -1,6 +1,5 @@
 import os
 import socket
-import pandas
 
 from pathlib import Path
 from flask import Flask, render_template, request, jsonify
@@ -9,7 +8,6 @@ from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType,StructField, StringType, IntegerType, BooleanType, TimestampType
 from pyspark.sql.functions import count, countDistinct, col, max as sparkMax
 from pyspark.sql.functions import monotonically_increasing_id
-
 
 spark = SparkSession.builder.getOrCreate()
 
@@ -25,7 +23,7 @@ print('  \:\  \            \::/  /   \:\ \:\__\    \:\ \:\__\     /:/  /        
 print('   \:\  \           /:/  /     \:\ \/__/     \:\ \/__/     \/__/            /:/  /        /:/  /   ')
 print('    \:\__\         /:/  /       \:\__\        \:\__\                       /:/  /        /:/  /    ')
 print('     \/__/         \/__/         \/__/         \/__/                       \/__/         \/__/     ')
-print('                                COMP4442 Project     Version: 0.9.8                                ')
+print('                                COMP4442 Project     Version: 0.9.9                                ')
 
 # Check whether the port is open. if it is used by other application, it will switch the other listen port
 host = "localhost"
