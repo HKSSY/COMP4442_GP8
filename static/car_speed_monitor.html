@@ -2,7 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Index</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Car Speed Monitor</title>
     <link rel="stylesheet" type="text/css" href="/static/css/surface_styles.css">
     <link rel="stylesheet" type="text/css" href="/static/css/monokai_sublime.css">
     <script src="/static/js/highlight.pack.js"></script>
@@ -13,6 +14,7 @@
     <link rel="mask-icon" href="/static/ico/safari-pinned-tab.svg" color="#5bbad5">
     <meta name="msapplication-TileColor" content="#da532c">
     <meta name="theme-color" content="#ffffff">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
     <input type="checkbox" id="nav--super-vertical-responsive">
@@ -28,15 +30,40 @@
 			<a href="about">About</a>
 		</nav>
 	</aside>
-    <main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
-        <header class="container">
-			<h1 class="m--1 g--4 g-s--12 docsHeader">Summary</h1>
-		</header>
-        <div class="g--10 m--1">
-            {% for table in tables %}
-                <!--{{titles[loop.index]}}-->
-                {{ table|safe }}
-            {% endfor %}
+  <main class="g--10 g-m--12 m--2 m-m--0 no-margin-vertical" role="main">
+    <header class="container">
+  <h1 class="m--1 g--4 g-s--12 docsHeader">Car Speed Monitor</h1>
+  </header>
+    <div class="g--10 m--1">
+    {% for driver_id, data in drivers_data.items() %}
+            <h2>Driver ID: {{ driver_id }}</h2>
+            <div style="width: 80%; margin: 0 auto;">
+                <canvas id="chart-{{ driver_id }}"></canvas>
+            </div>
+            <script>
+                var ctx = document.getElementById('chart-{{ driver_id }}').getContext('2d');
+                var chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: {{ data.dates|tojson }},
+                        datasets: [{
+                            label: 'Average Speed',
+                            data: {{ data.avg_speeds|tojson }},
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            </script>
+    {% endfor %}
         </div>
     </main>
     <footer class="g--10 m--2 g-m--12 m-m--0 no-margin-vertical">
