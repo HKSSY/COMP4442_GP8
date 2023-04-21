@@ -25,7 +25,7 @@ print('  \:\  \            \::/  /   \:\ \:\__\    \:\ \:\__\     /:/  /        
 print('   \:\  \           /:/  /     \:\ \/__/     \:\ \/__/     \/__/            /:/  /        /:/  /   ')
 print('    \:\__\         /:/  /       \:\__\        \:\__\                       /:/  /        /:/  /    ')
 print('     \/__/         \/__/         \/__/         \/__/                       \/__/         \/__/     ')
-print('                                COMP4442 Project     Version: 0.9.7                                ')
+print('                                COMP4442 Project     Version: 0.9.8                                ')
 
 # Check whether the port is open. if it is used by other application, it will switch the other listen port
 host = "localhost"
@@ -130,7 +130,12 @@ def fetch_data():
     order_column_name = request.form[f'columns[{order_column}][data]']
 
     records_total = spark.sql("SELECT COUNT(*) as count FROM RECORD").collect()[0]["count"]
-    records_filtered = records_total
+
+    # Update records_filtered based on search condition
+    if search_condition:
+        records_filtered = spark.sql(f"SELECT COUNT(*) as count FROM RECORD {search_condition}").collect()[0]["count"]
+    else:
+        records_filtered = records_total
 
     sql_results = spark.sql(f"""
         SELECT * FROM (
@@ -185,27 +190,12 @@ def summary():
     #return app.send_static_file('index.html')
 
 @app.route("/car_speed_monitor", methods=['GET', 'POST'])
-def sparkpi():
-    #test = dataset_dataframe.select('driverID').collect()
-    #test = dataset_dataframe.where("Time = '2017-01-01'").collect()
-    #test = dataset_dataframe.where("isHthrottleStop = 'NaN'").collect()
-    #print(test)
-    #count1 = dataset_dataframe.filter((col('driverID') == 'haowei1000008')).count()
-    #print(count1)
-    #count2 = dataset_dataframe.filter((col('driverID') == 'haowei1000008') & (col('isHthrottleStop').isNotNull())).count()
-    #print(count2)
-    #count = dataset_dataframe.filter((col('driverID') == 'haowei1000008') & (col('isHthrottleStop').isNull())).count()
-    #print(count)
-    #count3 = dataset_dataframe.groupBy('driverID').count().show()
-    #count3 = dataset_dataframe.select((col('driverID') == 'haowei1000008') & sparkMax(col('Speed'))).show()
-    #spark.sql("SELECT * FROM RECORD WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
-    #spark.sql("SELECT MAX(Speed) FROM RECORD WHERE driverID == 'haowei1000008'").show(5) # Show first 5 record
-    # SQL query with date extracted from "Time" column
+def car_speed_monitor():
     sql_query = "driverID, DATE(Time) AS `Date`, ROUND(AVG(Speed), 1) AS `AVG Speed`"
     sql_groupby_query = "GROUP BY driverID, DATE(Time)"
     sql_orderby_query = "ORDER BY driverID, Date"
     output_summary = spark.sql("SELECT " + sql_query + " FROM RECORD " + sql_groupby_query + " " + sql_orderby_query).collect()
-    print(output_summary)
+
     # Prepare the data for the graph
     drivers_data = {}
     for row in output_summary:
