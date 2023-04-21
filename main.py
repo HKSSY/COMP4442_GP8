@@ -23,10 +23,10 @@ print('  \:\  \            \::/  /   \:\ \:\__\    \:\ \:\__\     /:/  /        
 print('   \:\  \           /:/  /     \:\ \/__/     \:\ \/__/     \/__/            /:/  /        /:/  /   ')
 print('    \:\__\         /:/  /       \:\__\        \:\__\                       /:/  /        /:/  /    ')
 print('     \/__/         \/__/         \/__/         \/__/                       \/__/         \/__/     ')
-print('                                COMP4442 Project     Version: 0.9.9                                ')
+print('                               COMP4442 Project      Version: 0.9.10                               ')
 
 # Check whether the port is open. if it is used by other application, it will switch the other listen port
-host = "localhost"
+host = "0.0.0.0"
 port = 3500
 for i in range(0,10):
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -230,4 +230,4 @@ def handle_bad_request(e):
 
 if __name__ == "__main__":
     load_dataset()
-    app.run(host, port, debug=True)
+    app.run(host, port)
