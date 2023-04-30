@@ -9,9 +9,25 @@ The website should support the following functions:
 a) Generate a summary to show the driving behavior of each driver. 
 b) Monitor the driving speed of each driver in real-time.
 
+## Dataset Information
+<table>
+    <thead>
+        <tr>
+            <th>Feature</th>
+            <th>Comments</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>driverID</td>
+            <td>N/A</td>
+        </tr>
+    </tbody>
+</table>
+
 ## Group Members
+* [Dicky Shek](https://github.com/HKSSY)
 * PY Yuk 
 * Walter Yip
 * Roland Mok
-* [Dicky Shek](https://github.com/HKSSY)
 * Sam Kan
