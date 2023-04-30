@@ -6,8 +6,8 @@ As an important part of an intelligent transportation system, driving behavior a
 
 ## Goals
 The website should support the following functions: 
-a) Generate a summary to show the driving behavior of each driver. 
-b) Monitor the driving speed of each driver in real-time.
+- a) Generate a summary to show the driving behavior of each driver. 
+- b) Monitor the driving speed of each driver in real-time.
 
 ## Dataset Information
 There are 10 files in the dataset, each describing the drivers’ driving behavior one day. In each file, each row represents a record that describes the driving-related features. The features are separated by commas. There are 19 features in total. The detailed information on the dataset will be shown in the table below:
