@@ -22,6 +22,78 @@ b) Monitor the driving speed of each driver in real-time.
             <td>driverID</td>
             <td>N/A</td>
         </tr>
+        <tr>
+            <td>carPlateNumber</td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td>Latitude</td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td>Longtitude</td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td>Speed</td>
+            <td>Km/h</td>
+        </tr>
+        <tr>
+            <td>Direction</td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td>siteName</td>
+            <td>N/A</td>
+        </tr>
+        <tr>
+            <td>Time</td>
+            <td>The time reporting the record</td>
+        </tr>
+        <tr>
+            <td>isRapidlySpeedup</td>
+            <td>1 indicates the presence of the behavior</td>
+        </tr>
+        <tr>
+            <td>isRapidlySlowdown</td>
+            <td>1 indicates the presence of the behavior</td>
+        </tr>
+        <tr>
+            <td>isNeutralSlide</td>
+            <td>1 indicates the presence of the behavior</td>
+        </tr>
+        <tr>
+            <td>isNeutralSlideFinished</td>
+            <td>1 indicates the end of the behavior</td>
+        </tr>
+        <tr>
+            <td>neutralSlideTime</td>
+            <td>The  duration  of  a  neutral  slide  behavior (seconds)</td>
+        </tr>
+        <tr>
+            <td>isOverspeed</td>
+            <td>1 indicates the presence of the behavior</td>
+        </tr>
+        <tr>
+            <td>isOverspeedFinished</td>
+            <td>1 indicates the end of the behavior</td>
+        </tr>
+        <tr>
+            <td>overspeedTime</td>
+            <td>The  duration  of  an  overspeed  behavior (seconds)</td>
+        </tr>
+        <tr>
+            <td>isFatigueDriving</td>
+            <td>1 indicates the presence of the behavior</td>
+        </tr>
+        <tr>
+            <td>isHthrottleStop</td>
+            <td>1 indicates the presence of the behavior</td>
+        </tr>
+        <tr>
+            <td>isOilLeak</td>
+            <td>1 indicates the presence of the behavior</td>
+        </tr>
     </tbody>
 </table>
 
