@@ -98,9 +98,40 @@ There are 10 files in the dataset, each describing the drivers’ driving behavi
     </tbody>
 </table>
 
+## Designed Pages
+<table>
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Feature</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>index.html</td>
+            <td>Included a DataTables with a data filtering function</td>
+        </tr>
+        <tr>
+            <td>summary.html</td>
+            <td>Included a table for displaying each driverID summary data from the dataset</td>
+        </tr>
+        <tr>
+            <td>car_speed_monitor.html</td>
+            <td>Draw the average speed graph by day for each driverID</td>
+        </tr>
+        <tr>
+            <td>about.html</td>
+            <td>Show the group information</td>
+        </tr>
+    </tbody>
+</table>
+        
 ## Group Members
 * [Dicky Shek](https://github.com/HKSSY)
 * PY Yuk 
 * Walter Yip
 * Roland Mok
 * Sam Kan
+
+## Credit
+CSS framework: [Surface](https://github.com/mildrenben/surface)
